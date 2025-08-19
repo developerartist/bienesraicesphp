@@ -1,0 +1,13 @@
+@include tablet{
+    .sobre-nosotros{
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        column-gap: 3rem;
+    }
+}
+
+.sobre-nosotros{
+    h4{
+        margin-top: 3rem;
+    }
+}
