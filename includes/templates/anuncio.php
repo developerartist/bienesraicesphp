@@ -1,5 +1,5 @@
 <?php 
-    require 'includes/templates/config/database.php';
+    #require 'includes/app.php';
     $db = conectarDB();
 
     if($_SERVER["REQUEST_METHOD"] === 'GET'){

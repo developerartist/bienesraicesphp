@@ -1,5 +1,5 @@
 <?php 
-    require 'includes/templates/config/database.php';
+    #require 'includes/app.php';
     $db = conectarDB();
 
     $query = "SELECT * FROM propiedades LIMIT $limite;";

@@ -1,0 +1,16 @@
+{
+    "name": "hola/bienesraicesphp",
+    "description": "creando un proyecto con programacion orientada a objetos",
+    "type": "project",
+    "authors": [
+        {
+            "name": "angellolopez"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\":"./classes"
+        }
+    }
+}

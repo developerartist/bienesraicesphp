@@ -1,5 +1,5 @@
 <?php 
-    require 'includes/funciones.php';
+    require __DIR__.'/includes/app.php';
     incluirTemplates('header', $inicio = true);
 ?>
 
@@ -29,9 +29,9 @@
     <section class="seccion contenedor">
         <h2>Casas y Departamentos en Venta</h2>
         <div class="contenedor-anuncios">
-            <?php $limite = 3; 
-                include 'includes/templates/anuncios.php'; 
-            ?>
+            <!--php $limite = 3; 
+                include 'includes/templates/anuncios.php'; -->
+            
         </div>
         <div class="ver-todas alinear-derecha">
             <a href="anuncios.php" class="boton-verde">Ver Todas</a>

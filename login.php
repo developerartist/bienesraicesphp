@@ -1,8 +1,7 @@
 <?php 
     #incluye el header
-    require 'includes/funciones.php';
+    require 'includes/app.php';
     incluirTemplates('header');
-    require 'includes/templates/config/database.php';
     $db = conectarDB();
 
     $errores=[];

@@ -1,5 +1,5 @@
 <?php 
-    require 'includes/funciones.php';
+    require 'includes/app.php';
     incluirTemplates('header');
 ?>
 
@@ -8,7 +8,8 @@
         <div class="contenedor-anuncios">
             <?php 
                 $limite = 10;
-                include '../bienesraices_inicio/includes/templates/anuncios.php';
+                include '../bienesraicesphp/includes/templates/anuncios.php';
+                #include '../bienesraices_inicio/includes/templates/anuncios.php';
             ?>
         </div><!--contenedor-anuncio-->
     </main>

@@ -1,5 +1,5 @@
 <?php 
-    require '../bienesraices_inicio/includes/templates/config/database.php';
+    include 'includes/app.php';
     $db = conectarDB();
 
     $email = 'correo@correo.com';
