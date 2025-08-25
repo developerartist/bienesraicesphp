@@ -1,6 +1,5 @@
 <?php
 
-
     define('TEMPLATES_URL', __DIR__.'/templates');
     define('FUNCIONES_URL', __DIR__.'funciones.php');
 
@@ -10,11 +9,14 @@
 
     function estaAutenticado() : bool{
         session_start();
-        $auth = $_SESSION['login'];
-
-        if($auth){
-            return true;
+        if(!$_SESSION['login']){
+            header('Location: /');
         }
-        return false;
+    }
+    function debuggear($variable){
+        echo "<pre>";
+        var_dump($variable);
+        echo "</pre>";
+        exit;
     }
 ?>

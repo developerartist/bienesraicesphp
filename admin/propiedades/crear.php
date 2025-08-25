@@ -1,11 +1,12 @@
 <?php 
-    require '../../includes/funciones.php';
-    require '../../includes/templates/config/database.php';
+    namespace App;
+    use App\Propiedad;
+    require '../../includes/app.php';
 
-    $auth = estaAutenticado();
-    if(!$auth){
-        header('Location: /');
-    }
+    $propiedad = new Propiedad;
+
+    estaAutenticado();
+    
     $db = conectarDB();
     //consulta para obtener los vendedores
     $query[1] = "SELECT * FROM vendedores";
