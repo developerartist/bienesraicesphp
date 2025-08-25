@@ -4,10 +4,7 @@ use Dom\Mysql;
 
     require '../includes/funciones.php';
     require '../includes/templates/config/database.php';
-    $auth = estaAutenticado();
-    if( !$auth ){
-        header('Location: /');
-    }
+    estaAutenticado();
     $db = conectarDB();
 
     $query = "SELECT * FROM propiedades;";

@@ -8,6 +8,7 @@
     }
 
     function estaAutenticado() : bool{
+        debuggear ( $_SESSION['login'] );
         session_start();
         if(!$_SESSION['login']){
             header('Location: /');
