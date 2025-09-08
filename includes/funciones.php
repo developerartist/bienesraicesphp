@@ -8,12 +8,17 @@
     }
 
     function estaAutenticado() : bool{
-        debuggear ( $_SESSION['login'] );
         session_start();
         if(!$_SESSION['login']){
+            //echo "Sesion no iniciada";
             header('Location: /');
+            return false;
+        }else{
+            return true;
         }
+        
     }
+
     function debuggear($variable){
         echo "<pre>";
         var_dump($variable);

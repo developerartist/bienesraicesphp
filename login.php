@@ -10,7 +10,6 @@
     if($_SERVER["REQUEST_METHOD"] === 'POST'){
         $email = mysqli_real_escape_string( $db, filter_var($_POST["email"], FILTER_VALIDATE_EMAIL));
         $password = mysqli_real_escape_string( $db, $_POST["password"]);
-        
     }
 
     if( !$email ){
@@ -22,12 +21,10 @@
     if( empty($errores) ){
         $query = "SELECT * FROM usuarios WHERE email = '{$email}';";
         $resultado = mysqli_query( $db, $query );
-
         if($resultado->num_rows){
             
             $usuario = mysqli_fetch_assoc( $resultado );
-            $auth = password_verify( $password, $usuario["password"] );
-
+            $auth = password_verify( $password, $usuario["password"]);
             if( $auth ){
                 session_start();
                 $_SESSION['login'] = true;
@@ -35,6 +32,7 @@
 
                 header('Location: /admin');
             }else{
+                $email = $usuario["email"];
                 $errores[] = "El password es incorrecto";
             }
         }else{
@@ -54,7 +52,7 @@
             <fieldset>
                 <legend>E-mail y Password</legend>
                 <label for="email">E-mail</label>
-                <input type="email" placeholder="Tu Email" name="email">
+                <input type="email" placeholder="Tu Email" name="email" value="">
 
                 <label for="password">Password</label>
                 <input type="password" placeholder="Tu Password" name="password">
