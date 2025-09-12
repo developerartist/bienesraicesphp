@@ -1,7 +1,8 @@
 <?php 
-    namespace App;
-    use App\Propiedad;
     require '../../includes/app.php';
+    use App\Propiedad;
+    use Intervention\Image\ImageManager;
+    use Intervention\Image\Drivers\Gd\Driver;
 
     //estaAutenticado();
     
@@ -12,22 +13,31 @@
     $errores = Propiedad::getErrores();
     
     if($_SERVER["REQUEST_METHOD"] === 'POST'){
-        $propiedad = new Propiedad($_POST);
-        $errores = $propiedad->validar();
         
+        $propiedad = new Propiedad($_POST);
+		$nombre_imagen = md5(uniqid(rand(), true)).'.jpg';	
+        if($_FILES['imagen']['tmp_name']){
+            $manager = new ImageManager(Driver::class);
+            $imageIntervention = $manager->read($_FILES['imagen']['tmp_name'])->cover(800, 600);
+			
+			$propiedad->setImage($nombre_imagen);
+		}
+		$errores = $propiedad->validar();
+		
         if(empty($errores)){
-            $propiedad->guardarPropiedad();
-            /*SUBIDA DE ARCHIVOS*/
+			/*SUBIDA DE ARCHIVOS*/
             //Crear carpeta
-            $carpeta_imagenes = '../../imagenes';
-            if(!is_dir($carpeta_imagenes)){
-                mkdir($carpeta_imagenes);
+            if(!is_dir(CARPETA_IMAGENES)){
+				mkdir(CARPETA_IMAGENES);
             }
             //Generar nombre unico
-            $nombre_imagen =  md5(uniqid(rand(), true));
             //Subir imagen  
-            move_uploaded_file($imagen["tmp_name"], $carpeta_imagenes . "/". $nombre_imagen .".jpg");
-            
+			$imageIntervention->toJpeg(75)->save(CARPETA_IMAGENES.$nombre_imagen);
+            $resultado = $propiedad->guardarPropiedad();
+            debuggear($resultado);
+            if($resultado){
+				header('Location : /admin?resultado=1');
+			}
         }
         
     }
@@ -63,7 +73,7 @@
                 <label for="habitaciones">Habitaciones:</label>
                 <input type="number" id="habitaciones" name="habitaciones" placeholder="Ejemplo 3" min="1" max="9" value="<?php echo $habitaciones; ?>">
 
-                <label for="baños">WC:</label>
+                <label for="wc">Baños:</label>
                 <input type="number" id="wc" name="wc" placeholder="Ejemplo 3" min="1" max="9" value="<?php echo $baños; ?>">
 
                 <label for="estacionamiento">Estacionamiento:</label>
@@ -71,9 +81,9 @@
             </fieldset>
             <fieldset>
                 <legend>Vendedor</legend>
-                <select name="vendedor">
-                    <option value="">Selecciona una opción</option>
-                    <?php while($vendedor_assoc = mysqli_fetch_assoc($resultado1)):?>
+				<?php while($vendedor_assoc = mysqli_fetch_assoc($resultado1)):?>
+                <select name="vendedorId" value="<?php echo $vendedor_assoc["id"] ?>">
+                    <option >Selecciona una opción</option>
                         <option <?php echo $vendedor === $vendedor_assoc["id"]? 'selected':''; ?> value="<?php echo $vendedor_assoc["id"] ?>"><?php echo $vendedor_assoc["nombre"]. " ". $vendedor_assoc["apellido_paterno"]?></option>
                     <?php endwhile;?>
                 </select>

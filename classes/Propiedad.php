@@ -4,33 +4,34 @@ namespace App;
 class Propiedad{
 
     protected static $db;
-    protected static $columnasDB = ["id", "titulo", "precio", "descripcion", "habitaciones", "wc", "estacionamiento", "vendedorId", "imagen"];
+    protected static $columnasDB = ["id", "titulo", "precio","imagen", "descripcion", "habitaciones", "wc", "estacionamiento", "vendedorId"];
     protected static $errores = [];
 
     public $id;
     public $titulo;
     public $precio;
+    public $imagen;
     public $descripcion;
     public $habitaciones;
-    public $baños;
+    public $wc;
     public $estacionamiento;
-    public $vendedor;
-    public $imagen;
+    public $vendedorId;
 
     public static function setDB($database){
         self::$db = $database;
     }
 
     public function __construct($args = []){
+        
         $this->id = $args['id'] ?? '';
         $this->titulo = $args['titulo'] ?? '';
-        $this->precio = $args['precio'] ?? '';
+        $this->precio = $args['precio'] ?? 0;
+        $this->imagen = $args['imagen'] ?? '';
         $this->descripcion = $args['descripcion'] ?? '';
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
         $this->estacionamiento = $args['estacionamiento'] ?? '';
-        $this->vendedorId = $args['vendedor'] ?? '';
-        $this->imagen = $args['imagen'] ?? 'imagen.jpg';
+        $this->vendedorId = $args['vendedorId'] ?? '';
     }
 
     public function guardarPropiedad(){
@@ -41,11 +42,8 @@ class Propiedad{
         $query .= ") VALUES ('";
         $query .= implode("', '", array_values($atributos));
         $query .= "');";
-        $resultado = self::$db->query($query);       
-        
-        if($resultado){
-            header('Location: /crear');
-        } 
+        $resultado = self::$db->query($query);  
+        return $resultado;
     }
     public function arreglo(){
         $atributos = [];
@@ -69,12 +67,13 @@ class Propiedad{
     public static function getErrores(){
         return self::$errores;
     }
+
     
     public function validar(){
         if(!$this->titulo){
             self::$errores[] = "Debes añadir un titulo";
         }
-        if(!$this->precio || $precio === ''){
+        if(!$this->precio || $precio < 0){
             self::$errores[] = "El precio es obligatorio";
         }
         if(strlen($this->descripcion) < 50 ){
@@ -83,16 +82,25 @@ class Propiedad{
         if(!$this->habitaciones){
             self::$errores[] = "El numero de habitaciones es obligatorio";
         }
-        if(!$this->baños){
+        if($this->wc < 0 || $this->wc == '' ){
             self::$errores[] = "El numero de baños es obligatorio";
         }
         if(!$this->estacionamiento){
             self::$errores[] = "El numero de estacionamiento es obligatorio";
         }
-        if($this->vendedor == ''){
+        if($this->vendedorId == '' || $this->vendedorId <= 0){
             self::$errores[] = "Elije un vendedor";
         }
+        if($this->imagen == ''){
+            self::$errores[] = "La imagen es obligatoria";
+        }
         return self::$errores;
+    }
+
+    public function setImage($imagen){
+        if($imagen){
+            $this->imagen = $imagen;
+        }
     }
 }
 ?>
