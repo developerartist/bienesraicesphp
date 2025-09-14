@@ -25,4 +25,9 @@
         echo "</pre>";
         exit;
     }
+
+    function sA($html){
+        $s = htmlspecialchars($html);
+        return $s;
+    }
 ?>

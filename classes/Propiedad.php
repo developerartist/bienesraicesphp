@@ -31,7 +31,7 @@ class Propiedad{
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
         $this->estacionamiento = $args['estacionamiento'] ?? '';
-        $this->vendedorId = $args['vendedorId'] ?? '';
+        $this->vendedorId = $args['vendedorId'] ?? 1;
     }
 
     public function guardarPropiedad(){
@@ -101,6 +101,36 @@ class Propiedad{
         if($imagen){
             $this->imagen = $imagen;
         }
+    }
+
+    public static function all(){
+        $query = "SELECT * FROM propiedades;";
+        $resultado = self::consultarquery($query);
+        return $resultado;
+    }
+    public static function find($id){
+        $query = "SELECT * FROM propiedades WHERE id = $id;";
+        $resultado = self::consultarquery($query);
+        return array_shift( $resultado ) ;  
+    }
+
+    public static function consultarquery($query){
+        $resultado = self::$db->query($query);
+        $arr = [];
+        while($r = $resultado->fetch_assoc()):
+            $arr[] = self::crearobjeto($r);
+        endwhile;
+        $resultado->free();
+        return $arr;
+    }
+    protected static function crearobjeto($r){
+        $objeto = new self;
+        foreach($r as $key => $value){
+            if(property_exists($objeto, $key)):
+                $objeto->$key = $value;                
+            endif;
+        }
+        return $objeto;
     }
 }
 ?>
