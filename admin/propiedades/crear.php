@@ -14,12 +14,12 @@
     
     if($_SERVER["REQUEST_METHOD"] === 'POST'){
         
-        $propiedad = new Propiedad($_POST);
+        $propiedad = new Propiedad($_POST['propiedad']);
         //Generar nombre unico
 		$nombre_imagen = md5(uniqid(rand(), true)).'.jpg';	
         if($_FILES['imagen']['tmp_name']){
             $manager = new ImageManager(Driver::class);
-            $imageIntervention = $manager->read($_FILES['imagen']['tmp_name'])->cover(800, 600);
+            $imageIntervention = $manager->read($_FILES['propiedad']['imagen']['tmp_name'])->cover(800, 600);
 			$propiedad->setImage($nombre_imagen);
 		}
 		$errores = $propiedad->validar();
@@ -32,7 +32,7 @@
             }
             //Subir imagen  
 			$imageIntervention->toJpeg(75)->save(CARPETA_IMAGENES.$nombre_imagen);
-            $resultado = $propiedad->guardarPropiedad();
+            $resultado = $propiedad->guardar();
             if($resultado){
 				header('Location : /admin?resultado=1');
 			}

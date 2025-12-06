@@ -33,8 +33,14 @@ class Propiedad{
         $this->estacionamiento = $args['estacionamiento'] ?? '';
         $this->vendedorId = $args['vendedorId'] ?? 1;
     }
-
-    public function guardarPropiedad(){
+    public function guardar(){
+        if(isset($this->id)){
+            $this->actualizar();
+        }else{
+            $this->crear();
+        }
+    }
+    public function crear(){
 
         $atributos = $this->sanitizarAtributos();
         $query = "INSERT INTO `bienesraices_crud`.`propiedades` (";
@@ -44,6 +50,25 @@ class Propiedad{
         $query .= "');";
         $resultado = self::$db->query($query);  
         return $resultado;
+    }
+
+    public function actualizar(){
+        $atributos = $this->sanitizarAtributos();
+        $valores = [];
+
+        foreach($atributos AS $key => $value){
+            $valores[] = "{$key}='{$value}'";
+        }
+
+        $query = "UPDATE propiedades SET ";
+        $query .= join(', ',  $valores);
+        $query .= " WHERE id = '" .self::$db->escape_string($this->id). "' LIMIT 1;";
+        $resultado = self::$db->query($query);
+        if($resultado){
+            header('Location: /admin?resultado=2');
+        }
+        return $resultado;
+
     }
     public function arreglo(){
         $atributos = [];
@@ -73,7 +98,7 @@ class Propiedad{
         if(!$this->titulo){
             self::$errores[] = "Debes añadir un titulo";
         }
-        if(!$this->precio || $precio < 0){
+        if(!$this->precio){
             self::$errores[] = "El precio es obligatorio";
         }
         if(strlen($this->descripcion) < 50 ){
@@ -98,6 +123,12 @@ class Propiedad{
     }
 
     public function setImage($imagen){
+        if(isset($this-> id)){
+            $existeArchivo = file_exists(CARPETA_IMAGENES . $this->imagen);
+            if($existeArchivo){
+                unlink(CARPETA_IMAGENES .$this->imagen);
+            }
+        }
         if($imagen){
             $this->imagen = $imagen;
         }
@@ -108,6 +139,7 @@ class Propiedad{
         $resultado = self::consultarquery($query);
         return $resultado;
     }
+
     public static function find($id){
         $query = "SELECT * FROM propiedades WHERE id = $id;";
         $resultado = self::consultarquery($query);
@@ -131,6 +163,15 @@ class Propiedad{
             endif;
         }
         return $objeto;
+    }
+
+    //metodo sincronizar con los cambios realizados
+    public function sincronizar($args = []){
+        foreach($args as $key=>$value){
+            if(property_exists($this, $key) && !is_null($value)){
+                $this->$key = $value;
+            }
+        }
     }
 }
 ?>

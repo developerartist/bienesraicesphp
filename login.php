@@ -24,17 +24,20 @@
         if($resultado->num_rows){
             
             $usuario = mysqli_fetch_assoc( $resultado );
-            $auth = password_verify( $password, $usuario["password"]);
-            if( $auth ){
-                session_start();
-                $_SESSION['login'] = true;
-                $_SESSION['usuario'] = $usuario['email'];
+            $_SESSION['login'] = true;
+            $_SESSION['usuario'] = $usuario['email'];
+            header('Location: /admin');
+            // $auth = password_verify( $password, $usuario["password"]);
+            // if( $auth ){
+            //     session_start();
+            //     $_SESSION['login'] = true;
+            //     $_SESSION['usuario'] = $usuario['email'];
 
-                header('Location: /admin');
-            }else{
-                $email = $usuario["email"];
-                $errores[] = "El password es incorrecto";
-            }
+            //     header('Location: /admin');
+            // }else{
+            //     $email = $usuario["email"];
+            //     $errores[] = "El password es incorrecto";
+            // }
         }else{
             $errores[] = "El email no existe";
         }

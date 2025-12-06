@@ -1,5 +1,7 @@
 <?php 
     use App\Propiedad;
+    use Intervention\Image\ImageManager;
+    use Intervention\Image\Drivers\Gd\Driver;
     require '../../includes/app.php';
     estaAutenticado();
 
@@ -8,39 +10,30 @@
     if(!$id){
         header('Location : /admin');
     }
+
     $propiedad = Propiedad::find($id);
+    $errores = $propiedad->getErrores();
 
     $query[1] = "SELECT * FROM vendedores;";
     $vendedor_query = mysqli_query($db, $query[1]);
     if($_SERVER["REQUEST_METHOD"] === 'POST'){
+        $args = [];
+        $args = $_POST["propiedad"] ?? null;
+
+        $propiedad->sincronizar($args);
         $errores = $propiedad->validar();
         
-        if($errores){
-            /*SUBIDA DE ARCHIVOS*/
-            //Crear carpeta
+        $nombre_imagen = md5(uniqid(rand(), true)).'.jpg';	
+        if($_FILES["propiedad"]["tmp_name"]["imagen"]){
+            
+            $manager = new ImageManager(new Driver());
+            $imageIntervention = $manager->read($_FILES["propiedad"]["tmp_name"]["imagen"])->cover(800, 600);
+			$propiedad->setImage($nombre_imagen);
+		}
 
-            $carpeta_imagenes = '../../imagenes';
-            if(!is_dir($carpeta_imagenes)){
-                mkdir($carpeta_imagenes);
-            }
-            $nombre_imagen = '';
-            if( $imagen['name'] ){
-                unlink($carpeta_imagenes . '/' .$propiedad->imagen.'.jpg');
-                //Generar nombre unico
-                $nombre_imagen =  md5(uniqid(rand(), true));
-                //Subir imagen  
-                move_uploaded_file($imagen["tmp_name"], $carpeta_imagenes . "/". $nombre_imagen .".jpg");
-            }else{
-                $nombre_imagen = $propiedad->imagen;
-            }
-            
-            
-            $query = "UPDATE `bienesraices_crud`.`propiedades` SET `titulo` = '$titulo',`precio` = '$precio', `imagen` = '$nombre_imagen', `descripcion` = '$descripcion', `habitaciones` = $habitaciones,`wc` = $baños,
-            `estacionamiento` = $estacionamiento,`creado` = CURRENT_TIMESTAMP(), `vendedores_id` = $vendedor WHERE `id` = $id;";
-            $resultado = mysqli_query($db, $query);
-            if($resultado){
-                header('Location: /admin?resultado=2');
-            }
+        if(empty($errores)){
+            $imageIntervention->save(CARPETA_IMAGENES . $nombre_imagen);
+            $propiedad->guardar();
         }
         
     }
