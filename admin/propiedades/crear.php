@@ -1,15 +1,13 @@
 <?php 
     require '../../includes/app.php';
     use App\Propiedad;
+    use App\Vendedor;
     use Intervention\Image\ImageManager;
     use Intervention\Image\Drivers\Gd\Driver;
     // estaAutenticado();
     incluirTemplates('header');
-    
-    $db = conectarDB();
-    //consulta para obtener los vendedores
-    $query[1] = "SELECT * FROM vendedores";
-    $resultado1 = mysqli_query($db, $query[1]);
+    $propiedad = Propiedad::all();
+    $vendedores = Vendedor::all();
     $errores = Propiedad::getErrores();
     
     if($_SERVER["REQUEST_METHOD"] === 'POST'){
@@ -17,9 +15,10 @@
         $propiedad = new Propiedad($_POST['propiedad']);
         //Generar nombre unico
 		$nombre_imagen = md5(uniqid(rand(), true)).'.jpg';	
-        if($_FILES['imagen']['tmp_name']){
+        // debuggear($_FILES['propiedad']['tmp_name']['imagen']);
+        if($_FILES['propiedad']['tmp_name']['imagen']){
             $manager = new ImageManager(Driver::class);
-            $imageIntervention = $manager->read($_FILES['propiedad']['imagen']['tmp_name'])->cover(800, 600);
+            $imageIntervention = $manager->read($_FILES['propiedad']['tmp_name']['imagen'])->cover(800, 600);
 			$propiedad->setImage($nombre_imagen);
 		}
 		$errores = $propiedad->validar();
@@ -32,10 +31,7 @@
             }
             //Subir imagen  
 			$imageIntervention->toJpeg(75)->save(CARPETA_IMAGENES.$nombre_imagen);
-            $resultado = $propiedad->guardar();
-            if($resultado){
-				header('Location : /admin?resultado=1');
-			}
+            $propiedad->guardar();
         }
     }
 ?>

@@ -1,9 +1,10 @@
 <?php 
     use App\Propiedad;
+    use App\Vendedor;
     use Intervention\Image\ImageManager;
     use Intervention\Image\Drivers\Gd\Driver;
     require '../../includes/app.php';
-    estaAutenticado();
+    // estaAutenticado();
 
     $id = $_GET["p"];
     $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -13,9 +14,7 @@
 
     $propiedad = Propiedad::find($id);
     $errores = $propiedad->getErrores();
-
-    $query[1] = "SELECT * FROM vendedores;";
-    $vendedor_query = mysqli_query($db, $query[1]);
+    $vendedores = Vendedor::all();
     if($_SERVER["REQUEST_METHOD"] === 'POST'){
         $args = [];
         $args = $_POST["propiedad"] ?? null;
@@ -32,7 +31,9 @@
 		}
 
         if(empty($errores)){
-            $imageIntervention->save(CARPETA_IMAGENES . $nombre_imagen);
+            if($_FILES["propiedad"]["tmp_name"]["imagen"]){
+                $imageIntervention->save(CARPETA_IMAGENES . $nombre_imagen);
+            }
             $propiedad->guardar();
         }
         

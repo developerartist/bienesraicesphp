@@ -1,12 +1,9 @@
 <?php
 namespace App;
 
-class Propiedad{
-
-    protected static $db;
+class Propiedad extends ActiveRecord{
+    protected static $tabla = 'propiedades';
     protected static $columnasDB = ["id", "titulo", "precio","imagen", "descripcion", "habitaciones", "wc", "estacionamiento", "vendedorId"];
-    protected static $errores = [];
-
     public $id;
     public $titulo;
     public $precio;
@@ -17,13 +14,9 @@ class Propiedad{
     public $estacionamiento;
     public $vendedorId;
 
-    public static function setDB($database){
-        self::$db = $database;
-    }
-
     public function __construct($args = []){
         
-        $this->id = $args['id'] ?? '';
+        $this->id = $args['id'] ?? NULL;
         $this->titulo = $args['titulo'] ?? '';
         $this->precio = $args['precio'] ?? 0;
         $this->imagen = $args['imagen'] ?? '';
@@ -31,70 +24,10 @@ class Propiedad{
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
         $this->estacionamiento = $args['estacionamiento'] ?? '';
-        $this->vendedorId = $args['vendedorId'] ?? 1;
+        $this->vendedorId = $args['vendedorId'] ?? '';
     }
-    public function guardar(){
-        if(isset($this->id)){
-            $this->actualizar();
-        }else{
-            $this->crear();
-        }
-    }
-    public function crear(){
+     public function validar(){
 
-        $atributos = $this->sanitizarAtributos();
-        $query = "INSERT INTO `bienesraices_crud`.`propiedades` (";
-        $query .= implode(", ", array_keys($atributos));
-        $query .= ") VALUES ('";
-        $query .= implode("', '", array_values($atributos));
-        $query .= "');";
-        $resultado = self::$db->query($query);  
-        return $resultado;
-    }
-
-    public function actualizar(){
-        $atributos = $this->sanitizarAtributos();
-        $valores = [];
-
-        foreach($atributos AS $key => $value){
-            $valores[] = "{$key}='{$value}'";
-        }
-
-        $query = "UPDATE propiedades SET ";
-        $query .= join(', ',  $valores);
-        $query .= " WHERE id = '" .self::$db->escape_string($this->id). "' LIMIT 1;";
-        $resultado = self::$db->query($query);
-        if($resultado){
-            header('Location: /admin?resultado=2');
-        }
-        return $resultado;
-
-    }
-    public function arreglo(){
-        $atributos = [];
-
-        foreach(self::$columnasDB as $columna){
-            if($columna === 'id') continue;
-            $atributos[$columna] = $this->$columna;
-        }
-        return $atributos;
-    }
-
-    public function sanitizarAtributos(){
-        $atributos = $this->arreglo();
-        $sanitizado = [];
-        foreach($atributos as $key => $value){
-            $sanitizado[$key] = self::$db->escape_string($value);
-        }
-        return $sanitizado;
-    }
-
-    public static function getErrores(){
-        return self::$errores;
-    }
-
-    
-    public function validar(){
         if(!$this->titulo){
             self::$errores[] = "Debes añadir un titulo";
         }
@@ -120,58 +53,6 @@ class Propiedad{
             self::$errores[] = "La imagen es obligatoria";
         }
         return self::$errores;
-    }
-
-    public function setImage($imagen){
-        if(isset($this-> id)){
-            $existeArchivo = file_exists(CARPETA_IMAGENES . $this->imagen);
-            if($existeArchivo){
-                unlink(CARPETA_IMAGENES .$this->imagen);
-            }
-        }
-        if($imagen){
-            $this->imagen = $imagen;
-        }
-    }
-
-    public static function all(){
-        $query = "SELECT * FROM propiedades;";
-        $resultado = self::consultarquery($query);
-        return $resultado;
-    }
-
-    public static function find($id){
-        $query = "SELECT * FROM propiedades WHERE id = $id;";
-        $resultado = self::consultarquery($query);
-        return array_shift( $resultado ) ;  
-    }
-
-    public static function consultarquery($query){
-        $resultado = self::$db->query($query);
-        $arr = [];
-        while($r = $resultado->fetch_assoc()):
-            $arr[] = self::crearobjeto($r);
-        endwhile;
-        $resultado->free();
-        return $arr;
-    }
-    protected static function crearobjeto($r){
-        $objeto = new self;
-        foreach($r as $key => $value){
-            if(property_exists($objeto, $key)):
-                $objeto->$key = $value;                
-            endif;
-        }
-        return $objeto;
-    }
-
-    //metodo sincronizar con los cambios realizados
-    public function sincronizar($args = []){
-        foreach($args as $key=>$value){
-            if(property_exists($this, $key) && !is_null($value)){
-                $this->$key = $value;
-            }
-        }
     }
 }
 ?>

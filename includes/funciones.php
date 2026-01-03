@@ -7,17 +7,19 @@
         include TEMPLATES_URL."/{$nombre}.php";
     }
 
-    function estaAutenticado() : bool{
+    function estaAutenticado(): bool{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
-        if(!$_SESSION['login']){
-            //echo "Sesion no iniciada";
-            header('Location: /');
-            return false;
-        }else{
-            return true;
-        }
-        
     }
+    if (empty($_SESSION['login'])) {
+        debuggear($_SESSION);
+        header('Location: /', true, 302);
+        exit; // importante
+    }
+
+    return true;
+}
+
 
     function debuggear($variable){
         echo "<pre>";
@@ -29,5 +31,15 @@
     function sA($html){
         $s = htmlspecialchars($html);
         return $s;
+    }
+
+    function validarEntidad($entidad){
+        $entidades = ["Propiedad", "Vendedor"];
+        if(in_array($entidad, $entidades)){
+            return true;
+        }else{
+            return false;
+        }
+        return false; 
     }
 ?>
